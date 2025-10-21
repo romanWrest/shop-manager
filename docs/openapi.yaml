@@ -1,0 +1,2149 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/auth/admin/login": {
+      "post": {
+        "description": "Аутентификация администратора по email и паролю. Возвращает JWT токен и информацию о пользователе. Токен сохраняется в БД (механизм one-device-one-session).",
+        "operationId": "AuthController_loginAdmin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Успешная авторизация",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYjc5OTRmZS02MmNlLTRhOGQtOWQ5NS0zYjA5NWE1MTBkNDEiLCJlbWFpbCI6InJvb3RAZXhhbXBsZS5jb20iLCJyb2xlIjoiUk9PVCIsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwNjA0ODAwfQ.signature",
+                    "admin": {
+                      "id": "cb7994fe-62ce-4a8d-9d95-3b095a510d41",
+                      "name": "Root Admin",
+                      "email": "root@example.com",
+                      "role": "ROOT"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Неверные учетные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Invalid email or password",
+                    "error": "Unauthorized",
+                    "statusCode": 401
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Вход администратора",
+        "tags": [
+          "Аутентификация"
+        ]
+      }
+    },
+    "/auth/shop/login": {
+      "post": {
+        "description": "Аутентификация магазина по логину и паролю. Возвращает JWT токен и информацию о магазине. Токен сохраняется в БД.",
+        "operationId": "AuthController_loginShop",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginShopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Успешная авторизация",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTZlN2JhZC1kNGQ4LTQ1NTktYjliNy0wZTE4MGZlZGQzZTMiLCJsb2dpbiI6InRlc3RzaG9wMSIsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwNjA0ODAwfQ.signature",
+                    "shop": {
+                      "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                      "name": "Test Shop",
+                      "login": "testshop1",
+                      "address": "123 Test St",
+                      "inn": "1234567890"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Неверные учетные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Invalid login or password",
+                    "error": "Unauthorized",
+                    "statusCode": 401
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Вход магазина",
+        "tags": [
+          "Аутентификация"
+        ]
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "description": "Завершение текущей сессии. Инвалидирует JWT токен (удаляет из БД). Требует авторизацию.",
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "Успешный выход из системы",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Вы успешно вышли из системы"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Unauthorized",
+                    "statusCode": 401
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Выход из системы",
+        "tags": [
+          "Аутентификация"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "description": "Обновление истекающего или истекшего JWT токена. Возвращает новый токен с обновленным временем жизни.",
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Токен успешно обновлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjYjc5OTRmZS02MmNlLTRhOGQtOWQ5NS0zYjA5NWE1MTBkNDEiLCJlbWFpbCI6InJvb3RAZXhhbXBsZS5jb20iLCJyb2xlIjoiUk9PVCIsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwNjA0ODAwfQ.new_signature",
+                    "user": {
+                      "id": "cb7994fe-62ce-4a8d-9d95-3b095a510d41",
+                      "email": "root@example.com",
+                      "role": "ROOT"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Недействительный токен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Invalid token",
+                    "error": "Unauthorized",
+                    "statusCode": 401
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Обновление JWT токена",
+        "tags": [
+          "Аутентификация"
+        ]
+      }
+    },
+    "/admins": {
+      "get": {
+        "operationId": "AdminsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список администраторов"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить список администраторов",
+        "tags": [
+          "Администраторы"
+        ]
+      },
+      "post": {
+        "description": "Создание нового администратора только с ролью MANAGER. Доступно только ROOT.",
+        "operationId": "AdminsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Администратор успешно создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "cb7994fe-62ce-4a8d-9d95-3b095a510d41",
+                    "name": "Имя Фамилия",
+                    "email": "manager@example.com",
+                    "role": "MANAGER",
+                    "createdAt": "2025-01-17T10:00:00.000Z",
+                    "updatedAt": "2025-01-17T10:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные или email уже используется",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Email already exists",
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Создать нового администратора",
+        "tags": [
+          "Администраторы"
+        ]
+      }
+    },
+    "/admins/{id}/password": {
+      "patch": {
+        "operationId": "AdminsController_updatePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Пароль изменен"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Изменить пароль администратора (только ROOT)",
+        "tags": [
+          "Администраторы"
+        ]
+      }
+    },
+    "/admins/{id}": {
+      "delete": {
+        "operationId": "AdminsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Администратор удален"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Удалить администратора (только ROOT)",
+        "tags": [
+          "Администраторы"
+        ]
+      }
+    },
+    "/shops-owners": {
+      "get": {
+        "description": "Возвращает список всех владельцев магазинов с информацией об их магазинах. Требует роль ROOT или MANAGER.",
+        "operationId": "ShopOwnersController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список владельцев успешно получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                      "name": "Иванов Иван Иванович",
+                      "phone": "+79991234567",
+                      "email": "ivanov@example.com",
+                      "address": "г. Москва, ул. Пушкина, д. 5, кв. 10",
+                      "inn": "771234567890",
+                      "createdAt": "2025-10-19T10:00:00.000Z",
+                      "updatedAt": "2025-10-19T10:00:00.000Z",
+                      "shops": [
+                        {
+                          "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                          "name": "Магазин \"Продукты 24\"",
+                          "address": "г. Москва, ул. Ленина, д. 10",
+                          "login": "shop_products24"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить список всех владельцев магазинов",
+        "tags": [
+          "Владельцы магазинов"
+        ]
+      },
+      "post": {
+        "description": "Создание нового владельца магазинов в системе. Обязательные поля: имя и телефон. Email, адрес и ИНН необязательны.",
+        "operationId": "ShopOwnersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShopOwnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Владелец успешно создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                    "name": "Иванов Иван Иванович",
+                    "phone": "+79991234567",
+                    "email": "ivanov@example.com",
+                    "address": "г. Москва, ул. Пушкина, д. 5, кв. 10",
+                    "inn": "771234567890",
+                    "createdAt": "2025-10-19T10:00:00.000Z",
+                    "updatedAt": "2025-10-19T10:00:00.000Z",
+                    "shops": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные (например, неверный формат телефона или email)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": [
+                      "phone must be a valid phone number",
+                      "email must be an email"
+                    ],
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Создать нового владельца магазинов",
+        "tags": [
+          "Владельцы магазинов"
+        ]
+      }
+    },
+    "/shops-owners/{id}": {
+      "get": {
+        "description": "Возвращает детальную информацию о конкретном владельце магазина, включая список всех его магазинов.",
+        "operationId": "ShopOwnersController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о владельце успешно получена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                    "name": "Иванов Иван Иванович",
+                    "phone": "+79991234567",
+                    "email": "ivanov@example.com",
+                    "address": "г. Москва, ул. Пушкина, д. 5, кв. 10",
+                    "inn": "771234567890",
+                    "createdAt": "2025-10-19T10:00:00.000Z",
+                    "updatedAt": "2025-10-19T10:00:00.000Z",
+                    "shops": [
+                      {
+                        "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                        "name": "Магазин \"Продукты 24\"",
+                        "address": "г. Москва, ул. Ленина, д. 10",
+                        "inn": "7707083893",
+                        "login": "shop_products24"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Владелец не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop owner not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить информацию о владельце по ID",
+        "tags": [
+          "Владельцы магазинов"
+        ]
+      },
+      "patch": {
+        "description": "Обновление данных владельца магазинов (имя, телефон, email, адрес, ИНН). Все поля опциональны при обновлении.",
+        "operationId": "ShopOwnersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShopOwnerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Информация о владельце успешно обновлена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                    "name": "Иванов Иван Петрович",
+                    "phone": "+79991234567",
+                    "email": "ivanov.new@example.com",
+                    "address": "г. Москва, ул. Пушкина, д. 5, кв. 10",
+                    "inn": "771234567890",
+                    "createdAt": "2025-10-19T10:00:00.000Z",
+                    "updatedAt": "2025-10-21T15:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": [
+                      "email must be an email"
+                    ],
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Владелец не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop owner not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Обновить информацию о владельце",
+        "tags": [
+          "Владельцы магазинов"
+        ]
+      },
+      "delete": {
+        "description": "Удаление владельца из системы. ВНИМАНИЕ: При удалении владельца все связанные с ним магазины также будут удалены (каскадное удаление). Терминалы магазинов не удаляются, но теряют связь с магазином.",
+        "operationId": "ShopOwnersController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Владелец успешно удален",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop owner deleted successfully",
+                    "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Владелец не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop owner not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Удалить владельца магазинов",
+        "tags": [
+          "Владельцы магазинов"
+        ]
+      }
+    },
+    "/shops": {
+      "get": {
+        "description": "Возвращает список всех магазинов с информацией о владельцах и привязанных терминалах. Требует роль ROOT или MANAGER.",
+        "operationId": "ShopsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список магазинов успешно получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                      "name": "Магазин \"Продукты 24\"",
+                      "address": "г. Москва, ул. Ленина, д. 10",
+                      "inn": "7707083893",
+                      "kpp": "770701001",
+                      "ogrn": "1027700132195",
+                      "login": "shop_products24",
+                      "ownerId": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                      "createdAt": "2025-10-20T10:00:00.000Z",
+                      "updatedAt": "2025-10-20T10:00:00.000Z",
+                      "owner": {
+                        "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                        "name": "Иванов Иван Иванович",
+                        "phone": "+79991234567"
+                      },
+                      "terminals": [
+                        {
+                          "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                          "macAddress": "FF:EE:DD:CC:BB:AA",
+                          "status": "ACTIVE"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить список всех магазинов",
+        "tags": [
+          "Магазины"
+        ]
+      },
+      "post": {
+        "description": "Создание нового магазина с учетными данными для входа. Пароль автоматически хешируется. Логин должен быть уникальным в системе.",
+        "operationId": "ShopsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateShopDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Магазин успешно создан",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                    "name": "Магазин \"Продукты 24\"",
+                    "address": "г. Москва, ул. Ленина, д. 10",
+                    "inn": "7707083893",
+                    "kpp": "770701001",
+                    "ogrn": "1027700132195",
+                    "login": "shop_products24",
+                    "ownerId": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                    "createdAt": "2025-10-20T10:00:00.000Z",
+                    "updatedAt": "2025-10-20T10:00:00.000Z",
+                    "owner": {
+                      "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                      "name": "Иванов Иван Иванович",
+                      "phone": "+79991234567"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные или логин уже используется",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop with this login already exists",
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Владелец магазина не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop owner not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Создать новый магазин",
+        "tags": [
+          "Магазины"
+        ]
+      }
+    },
+    "/shops/{id}": {
+      "get": {
+        "description": "Возвращает детальную информацию о конкретном магазине, включая данные владельца и список терминалов.",
+        "operationId": "ShopsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Информация о магазине успешно получена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                    "name": "Магазин \"Продукты 24\"",
+                    "address": "г. Москва, ул. Ленина, д. 10",
+                    "inn": "7707083893",
+                    "kpp": "770701001",
+                    "ogrn": "1027700132195",
+                    "login": "shop_products24",
+                    "ownerId": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                    "createdAt": "2025-10-20T10:00:00.000Z",
+                    "updatedAt": "2025-10-20T10:00:00.000Z",
+                    "owner": {
+                      "id": "f5b9e8a1-3c4d-4e5f-9a8b-7c6d5e4f3a2b",
+                      "name": "Иванов Иван Иванович",
+                      "phone": "+79991234567",
+                      "email": "ivanov@example.com"
+                    },
+                    "terminals": []
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Магазин не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить информацию о магазине по ID",
+        "tags": [
+          "Магазины"
+        ]
+      },
+      "delete": {
+        "description": "Удаление магазина из системы. При удалении магазина все привязанные к нему терминалы теряют связь с магазином (shopId устанавливается в null), но сами терминалы не удаляются.",
+        "operationId": "ShopsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Магазин успешно удален",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop deleted successfully",
+                    "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Магазин не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Удалить магазин",
+        "tags": [
+          "Магазины"
+        ]
+      }
+    },
+    "/shops/{id}/credentials": {
+      "patch": {
+        "description": "Обновление логина и/или пароля для входа в систему от имени магазина. Пароль автоматически хешируется. Новый логин должен быть уникальным.",
+        "operationId": "ShopsController_updateCredentials",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateShopCredentialsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Учетные данные успешно обновлены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                    "name": "Магазин \"Продукты 24\"",
+                    "login": "shop_products24_new",
+                    "updatedAt": "2025-10-21T14:35:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Новый логин уже используется другим магазином",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Login already in use",
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Магазин не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Shop not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Обновить учетные данные магазина",
+        "tags": [
+          "Магазины"
+        ]
+      }
+    },
+    "/terminals": {
+      "get": {
+        "operationId": "TerminalsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список терминалов"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Получить список терминалов",
+        "tags": [
+          "Терминалы"
+        ]
+      },
+      "post": {
+        "operationId": "TerminalsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTerminalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Терминал создан"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Создать новый терминал",
+        "tags": [
+          "Терминалы"
+        ]
+      }
+    },
+    "/terminals/{id}": {
+      "get": {
+        "operationId": "TerminalsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Данные терминала"
+          },
+          "404": {
+            "description": "Терминал не найден"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Получить карточку терминала",
+        "tags": [
+          "Терминалы"
+        ]
+      },
+      "patch": {
+        "operationId": "TerminalsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTerminalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Терминал обновлен"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Обновить терминал",
+        "tags": [
+          "Терминалы"
+        ]
+      },
+      "delete": {
+        "operationId": "TerminalsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Терминал удален"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Удалить терминал",
+        "tags": [
+          "Терминалы"
+        ]
+      }
+    },
+    "/terminals/{id}/status": {
+      "patch": {
+        "description": "Ручное изменение статуса терминала (ACTIVE/INACTIVE). Используется для тестирования или административных целей. Требует роль ROOT или MANAGER.",
+        "operationId": "TerminalsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTerminalStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статус терминала успешно обновлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                    "macAddress": "FF:EE:DD:CC:BB:AA",
+                    "status": "INACTIVE",
+                    "shopId": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                    "createdAt": "2025-10-19T22:45:05.685Z",
+                    "updatedAt": "2025-10-19T22:46:56.829Z",
+                    "shop": {
+                      "id": "a96e7bad-d4d8-4559-b9b7-0e180fedd3e3",
+                      "name": "Test Shop",
+                      "address": "123 Test St"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Терминал не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Terminal not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          },
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Обновить статус терминала вручную",
+        "tags": [
+          "Терминалы"
+        ]
+      }
+    },
+    "/terminals/alive": {
+      "post": {
+        "description": "Эндпоинт для получения heartbeat-сигнала от терминала. Автоматически обновляет статус на ACTIVE и время последнего обновления. НЕ требует авторизации (публичный эндпоинт для терминалов).",
+        "operationId": "TerminalsController_heartbeat",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TerminalHeartbeatDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Heartbeat получен, статус обновлен на ACTIVE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                    "macAddress": "FF:EE:DD:CC:BB:AA",
+                    "status": "ACTIVE",
+                    "updatedAt": "2025-10-19T22:47:03.545Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Терминал с указанным MAC адресом не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Terminal not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Heartbeat от терминала",
+        "tags": [
+          "Терминалы"
+        ]
+      }
+    },
+    "/requests": {
+      "get": {
+        "description": "Возвращает список всех заявок на подключение терминалов к магазинам. Доступно для администраторов(ROOT и MANAGER)",
+        "operationId": "RequestsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список заявок",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": "b0816217-c88f-402f-9c26-de995d57ad86",
+                      "terminalId": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                      "shopLogin": "testshop1",
+                      "status": "PENDING",
+                      "comment": "Заявка проверена, все документы в порядке",
+                      "createdAt": "2025-10-19T22:45:37.148Z",
+                      "updatedAt": "2025-10-19T22:45:47.884Z",
+                      "terminal": {
+                        "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                        "macAddress": "FF:EE:DD:CC:BB:AA",
+                        "status": "ACTIVE"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить список заявок",
+        "tags": [
+          "Заявки"
+        ]
+      },
+      "post": {
+        "description": "Создание заявки на подключение терминала к магазину. Заявка создается в статусе PENDING.",
+        "operationId": "RequestsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Заявка создана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "b0816217-c88f-402f-9c26-de995d57ad86",
+                    "terminalId": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                    "shopLogin": "testshop1",
+                    "status": "PENDING",
+                    "comment": null,
+                    "createdAt": "2025-10-19T22:45:37.148Z",
+                    "updatedAt": "2025-10-19T22:45:37.148Z",
+                    "terminal": {
+                      "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                      "macAddress": "FF:EE:DD:CC:BB:AA",
+                      "status": "ACTIVE"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные данные или заявка уже существует",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request already exists for this terminal and shop",
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Создать новую заявку",
+        "tags": [
+          "Заявки"
+        ]
+      }
+    },
+    "/requests/{id}": {
+      "get": {
+        "description": "Возвращает детальную информацию о конкретной заявке по её ID.",
+        "operationId": "RequestsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Данные заявки",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "b0816217-c88f-402f-9c26-de995d57ad86",
+                    "terminalId": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                    "shopLogin": "testshop1",
+                    "status": "PENDING",
+                    "comment": null,
+                    "createdAt": "2025-10-19T22:45:37.148Z",
+                    "updatedAt": "2025-10-19T22:45:37.148Z",
+                    "terminal": {
+                      "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                      "macAddress": "FF:EE:DD:CC:BB:AA",
+                      "status": "ACTIVE"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Заявка не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Получить заявку по ID",
+        "tags": [
+          "Заявки"
+        ]
+      },
+      "delete": {
+        "operationId": "RequestsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Заявка удалена"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Удалить заявку",
+        "tags": [
+          "Заявки"
+        ]
+      }
+    },
+    "/requests/{id}/approve": {
+      "patch": {
+        "description": "Одобрение заявки на подключение. Терминал автоматически привязывается к магазину (атомарная операция в транзакции). Статус заявки меняется на APPROVED.",
+        "operationId": "RequestsController_approve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Заявка одобрена, терминал подключен к магазину",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request approved and terminal connected to shop",
+                    "status": "APPROVED"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Заявка уже обработана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request has already been processed",
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Заявка не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Одобрить заявку",
+        "tags": [
+          "Заявки"
+        ]
+      }
+    },
+    "/requests/{id}/reject": {
+      "patch": {
+        "description": "Отклонение заявки на подключение терминала. Статус заявки меняется на REJECTED. Терминал остается не привязанным к магазину.",
+        "operationId": "RequestsController_reject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Заявка отклонена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request rejected",
+                    "status": "REJECTED"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Заявка уже обработана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request has already been processed",
+                    "error": "Bad Request",
+                    "statusCode": 400
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Заявка не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Отклонить заявку",
+        "tags": [
+          "Заявки"
+        ]
+      }
+    },
+    "/requests/{id}/comment": {
+      "post": {
+        "description": "Добавление или обновление комментария к заявке. Комментарий может содержать причину одобрения/отклонения или дополнительные замечания.",
+        "operationId": "RequestsController_addComment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Комментарий добавлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": "b0816217-c88f-402f-9c26-de995d57ad86",
+                    "terminalId": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                    "shopLogin": "testshop1",
+                    "status": "PENDING",
+                    "comment": "Заявка проверена, все документы в порядке",
+                    "createdAt": "2025-10-19T22:45:37.148Z",
+                    "updatedAt": "2025-10-19T22:45:47.884Z",
+                    "terminal": {
+                      "id": "0bd492c9-5d78-428d-8ef3-3d5ece1296c6",
+                      "macAddress": "FF:EE:DD:CC:BB:AA",
+                      "status": "ACTIVE"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Заявка не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Request not found",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Добавить комментарий к заявке",
+        "tags": [
+          "Заявки"
+        ]
+      }
+    },
+    "/profile/password": {
+      "patch": {
+        "description": "Изменение пароля для текущего авторизованного пользователя (администратора или магазина). Требует подтверждение текущего пароля. Для администраторов: токен автоматически инвалидируется (удаляется из БД) для безопасности. Для магазинов: пароль обновляется в БД. После смены пароля требуется повторный вход.",
+        "operationId": "ProfileController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Пароль успешно изменен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Пароль успешно изменен. Пожалуйста, войдите заново."
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Неверный текущий пароль или пользователь не авторизован",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Неверный текущий пароль",
+                    "error": "Unauthorized",
+                    "statusCode": 401
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пользователь не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Администратор не найден",
+                    "error": "Not Found",
+                    "statusCode": 404
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Смена пароля текущего пользователя",
+        "tags": [
+          "Профиль"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Shop Terminals Management API",
+    "description": "",
+    "version": "1.0",
+    "contact": {
+
+    }
+  },
+  "tags": [
+    {
+      "name": "Аутентификация",
+      "description": "Вход в систему, выход, обновление токена"
+    },
+    {
+      "name": "Администраторы",
+      "description": "Управление администраторами системы (ROOT, MANAGER)"
+    },
+    {
+      "name": "Владельцы магазинов",
+      "description": "Управление владельцами торговых точек"
+    },
+    {
+      "name": "Магазины",
+      "description": "Управление торговыми точками"
+    },
+    {
+      "name": "Терминалы",
+      "description": "Управление терминалами и их статусами"
+    },
+    {
+      "name": "Заявки",
+      "description": "Управление заявками на подключение терминалов"
+    },
+    {
+      "name": "Профиль",
+      "description": "Управление профилем текущего пользователя"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "JWT-auth": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "name": "JWT",
+        "description": "Введите JWT токен полученный при авторизации",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "LoginAdminDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "root@example.com",
+            "description": "Email администратора"
+          },
+          "password": {
+            "type": "string",
+            "example": "rootpass123",
+            "description": "Пароль (минимум 6 символов)"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "LoginShopDto": {
+        "type": "object",
+        "properties": {
+          "login": {
+            "type": "string",
+            "example": "shop1",
+            "description": "Логин магазина"
+          },
+          "password": {
+            "type": "string",
+            "example": "shoppass123",
+            "description": "Пароль (минимум 6 символов)"
+          }
+        },
+        "required": [
+          "login",
+          "password"
+        ]
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            "description": "JWT токен для обновления"
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "CreateAdminDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Имя Фамилия",
+            "description": "Полное имя администратора"
+          },
+          "email": {
+            "type": "string",
+            "example": "manager@example.com",
+            "description": "Email администратора, unique"
+          },
+          "password": {
+            "type": "string",
+            "example": "123456",
+            "description": "Пароль (минимум 6 символов)"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "UpdatePasswordDto": {
+        "type": "object",
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "example": "newsecurepass456",
+            "description": "Новый пароль (минимум 6 символов)"
+          }
+        },
+        "required": [
+          "newPassword"
+        ]
+      },
+      "CreateShopOwnerDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "ИП Иванов Иван Иванович",
+            "description": "Полное наименование владельца магазина (ФИО или название организации)"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+79001234567",
+            "description": "Контактный телефон"
+          },
+          "email": {
+            "type": "string",
+            "example": "ivanov@example.com",
+            "description": "Email для связи"
+          },
+          "address": {
+            "type": "string",
+            "example": "г. Ростов-на-Донц, ул. Соколова 76",
+            "description": "Адрес регистрации владельца"
+          },
+          "inn": {
+            "type": "string",
+            "example": "123456789012",
+            "description": "ИНН (для юридических лиц и ИП)"
+          }
+        },
+        "required": [
+          "name",
+          "phone"
+        ]
+      },
+      "UpdateShopOwnerDto": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "CreateShopDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Магазин \"Продукты 24\"",
+            "description": "Наименование торговой точки"
+          },
+          "address": {
+            "type": "string",
+            "example": "г. Москва, ул. Тверская, д. 5",
+            "description": "Адрес магазина"
+          },
+          "inn": {
+            "type": "string",
+            "example": "7707083893",
+            "description": "ИНН организации (10 или 12 цифр)"
+          },
+          "kpp": {
+            "type": "string",
+            "example": "770701001",
+            "description": "КПП (для юридических лиц)"
+          },
+          "ogrn": {
+            "type": "string",
+            "example": "1027700132195",
+            "description": "ОГРН (для юридических лиц)"
+          },
+          "login": {
+            "type": "string",
+            "example": "shop_24_tverskaya",
+            "description": "Логин для входа в систему (должен быть уникальным)"
+          },
+          "password": {
+            "type": "string",
+            "example": "secureShopPass123",
+            "description": "Пароль для входа (минимум 6 символов)"
+          },
+          "ownerId": {
+            "type": "string",
+            "example": "adcbd5f2-6b80-4987-9035-11f868b073a3",
+            "description": "ID владельца магазина (UUID)"
+          }
+        },
+        "required": [
+          "name",
+          "address",
+          "inn",
+          "login",
+          "password",
+          "ownerId"
+        ]
+      },
+      "UpdateShopCredentialsDto": {
+        "type": "object",
+        "properties": {
+
+        }
+      },
+      "CreateTerminalDto": {
+        "type": "object",
+        "properties": {
+          "macAddress": {
+            "type": "string",
+            "example": "AA:BB:CC:DD:EE:FF",
+            "description": "MAC адрес терминала"
+          },
+          "shopId": {
+            "type": "string",
+            "example": "uuid-shop-id",
+            "description": "ID магазина"
+          }
+        },
+        "required": [
+          "macAddress"
+        ]
+      },
+      "UpdateTerminalDto": {
+        "type": "object",
+        "properties": {
+          "macAddress": {
+            "type": "string",
+            "example": "AA:BB:CC:DD:EE:FF"
+          },
+          "status": {
+            "type": "string",
+            "example": "ACTIVE",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ]
+          },
+          "shopId": {
+            "type": "string",
+            "example": "uuid-shop-id"
+          }
+        }
+      },
+      "UpdateTerminalStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ACTIVE",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE"
+            ],
+            "description": "Новый статус терминала"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "TerminalHeartbeatDto": {
+        "type": "object",
+        "properties": {
+          "macAddress": {
+            "type": "string",
+            "example": "AA:BB:CC:DD:EE:FF",
+            "description": "MAC адрес терминала"
+          }
+        },
+        "required": [
+          "macAddress"
+        ]
+      },
+      "CreateRequestDto": {
+        "type": "object",
+        "properties": {
+          "terminalId": {
+            "type": "string",
+            "example": "uuid-terminal-id",
+            "description": "ID терминала"
+          },
+          "shopLogin": {
+            "type": "string",
+            "example": "shop1",
+            "description": "Логин магазина"
+          }
+        },
+        "required": [
+          "terminalId",
+          "shopLogin"
+        ]
+      },
+      "AddCommentDto": {
+        "type": "object",
+        "properties": {
+          "comment": {
+            "type": "string",
+            "example": "Заявка одобрена после проверки документов",
+            "description": "Комментарий к заявке"
+          }
+        },
+        "required": [
+          "comment"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "example": "changeMe",
+            "description": "Текущий пароль"
+          },
+          "newPassword": {
+            "type": "string",
+            "example": "newPassword",
+            "description": "Новый пароль (минимум 6 символов)"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      }
+    }
+  }
+}
